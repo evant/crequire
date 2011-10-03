@@ -1,16 +1,17 @@
-= crequire
+# crequire
 
 A simply way to require c code in ruby using SWIG.
 
-== Dependencies
+## Dependencies
 
 * ruby 1.9
 * make
 * SWIG
 
-== A simple example
+## A simple example
 
-=== example1.h
+### example1.h
+
 ```c
 // If you have a header file then the functions are detected automatically. You
 // can either define the functions in the header file or define a header and
@@ -29,7 +30,7 @@ void swap(int *a, int *b) {
 }
 ```
 
-=== test_example1.rb
+### test_example1.rb
 
 ```ruby
 require "crequire"
@@ -49,9 +50,9 @@ ptrfree(a)
 ptrfree(b)
 ```
 
-== A complex example
+## A complex example
 
-=== example2.c
+### example2.c
 
 ```c
 // If you don't define a header file, you must pass in a block to define the
@@ -66,7 +67,7 @@ void add(int *x, int *y, int *r) {
 }
 ```
 
-=== test_example2.rb
+### test_example2.rb
 
 ```ruby
 require "crequire"
@@ -91,7 +92,7 @@ Example2.sum(1, 2) => 3
 Example2.add(3, 4) => 7
 ```
 
-== Contributing to crequire
+## Contributing to crequire
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
@@ -101,7 +102,7 @@ Example2.add(3, 4) => 7
 * Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
 
-== Copyright
+## Copyright
 
 Copyright (c) 2011 Evan Tatarka. See LICENSE.txt for
 further details.
