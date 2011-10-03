@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "crequire"
   gem.homepage = "http://github.com/evant/crequire"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Allows you to include a c file as a ruby module}
+  gem.description = %Q{Allows you to include a c file as a ruby module}
   gem.email = "evantatarka@gmail.com"
   gem.authors = ["Evan Tatarka"]
   # dependencies defined in Gemfile
