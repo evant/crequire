@@ -1,6 +1,88 @@
 = crequire
 
-Description goes here.
+A simply way to require c code in ruby using SWIG.
+
+== Dependencies
+
+* ruby 1.9
+* make
+* SWIG
+
+== A simple example
+
+=== example1.h
+
+// If you have a header file then the functions are detected automatically. You
+// can either define the functions in the header file or define a header and
+// implementation file separately.
+
+int fact(int n) {
+  if (n <= 1) return 1;
+  else return n * fact(n-1);
+}
+
+void swap(int *a, int *b) {
+  int tmp;
+  tmp = *b;
+  *b = *a;
+  *a = tmp;
+}
+
+=== test_example1.rb
+
+require "crequire"
+crequire "example1"
+
+Example1.fact(4) => 24
+
+a = ptrcreate("int", 1)
+b = ptrcreate("int", 2)
+
+Example1.swap(a, b)
+
+a => 2
+b => 1
+
+ptrfree(a)
+ptrfree(b)
+
+== A complex example
+
+=== example2.c
+
+// If you don't define a header file, you must pass in a block to define the
+// method signatures.
+
+int sum(int a, int b) {
+  return a + b;
+}
+
+void add(int *x, int *y, int *r) {
+  *r = *x + *y;
+}
+
+=== test_example2.rb
+
+require "crequire"
+
+# :force => true forces a compile on every run. Alternatively, you can delete
+# the 'example2.o' file for a recompile.
+
+crequire "example2", :force => true do
+  # To define a method signature, call a function corresponding to the function
+  # you are defining. Pass in the types of the arguments in order, followed by
+  # what is returned. You don't have to specify a return if it is void.   
+
+  sum(:int, :int, :returns => :int)
+
+  # To make working with pointers easer, you can define them as :input or
+  # :output. 
+
+  add(:int => :input, :int => :input, :int => :output)
+end
+
+Example2.sum(1, 2) => 3
+Example2.add(3, 4) => 7
 
 == Contributing to crequire
  
