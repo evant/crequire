@@ -2,9 +2,13 @@ require 'fileutils'
 require 'tmpdir'
 
 def crequire(file_path, options = {})
-  if options[:force] or !File.exists?("#{file_path}.o")
-    @file_path = file_path
-    @file = split_all(file_path).last
+  @force = options[:force]
+  @debug = options[:debug]
+
+  @file_path = file_path
+  @file = split_all(file_path).last
+
+  if @force or !File.exists?("#{file_path}.o")
     Dir.mktmpdir do |tmp|
       @tmp = tmp
       create_interface
@@ -13,7 +17,11 @@ def crequire(file_path, options = {})
     end
   end
 
-  require file_path
+  begin
+    require @file_path
+  rescue LoadError #try the current directoy if the full path doesn't work
+    require @file
+  end
 end
 
 private
@@ -26,7 +34,7 @@ def create_interface
 #include "#{@file}.h"
 %}
 %include "#{@file}.h"
-%include "pointer.i"
+%include "cpointer.i"
     FILE
   end
 end
@@ -41,12 +49,8 @@ create_makefile('#{@file}')
 end
 
 def install                                  
-  if File.exists?(@file_path + ".c")
-    FileUtils.cp @file_path + ".c", File.join(@tmp, @file) + ".c"
-  end
-  if File.exists?(@file_path + ".h")
-    FileUtils.cp @file_path + ".h", File.join(@tmp, @file) + ".h"
-  end
+  copy_in @file_path, @file, ".c"
+  copy_in @file_path, @file, ".h"
 
   dir = Dir.pwd
   Dir.chdir @tmp
@@ -57,6 +61,14 @@ def install
   Dir.chdir dir
 
   FileUtils.cp File.join(@tmp, @file + "_wrap.o"), @file_path + ".o"
+end
+
+def copy_in(file_path, name, ext)
+  if File.exists?(file_path + ext)
+    FileUtils.cp file_path + ext, File.join(@tmp, name) + ext
+  elsif @debug
+    puts "could not find file: #{file_path + ext} in #{Dir.pwd}"
+  end
 end
 
 def temp_path
