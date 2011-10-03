@@ -11,7 +11,7 @@ A simply way to require c code in ruby using SWIG.
 == A simple example
 
 === example1.h
-
+```c
 // If you have a header file then the functions are detected automatically. You
 // can either define the functions in the header file or define a header and
 // implementation file separately.
@@ -27,9 +27,11 @@ void swap(int *a, int *b) {
   *b = *a;
   *a = tmp;
 }
+```
 
 === test_example1.rb
 
+```ruby
 require "crequire"
 crequire "example1"
 
@@ -45,11 +47,13 @@ b => 1
 
 ptrfree(a)
 ptrfree(b)
+```
 
 == A complex example
 
 === example2.c
 
+```c
 // If you don't define a header file, you must pass in a block to define the
 // method signatures.
 
@@ -60,9 +64,11 @@ int sum(int a, int b) {
 void add(int *x, int *y, int *r) {
   *r = *x + *y;
 }
+```
 
 === test_example2.rb
 
+```ruby
 require "crequire"
 
 # :force => true forces a compile on every run. Alternatively, you can delete
@@ -83,6 +89,7 @@ end
 
 Example2.sum(1, 2) => 3
 Example2.add(3, 4) => 7
+```
 
 == Contributing to crequire
  
