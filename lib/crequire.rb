@@ -1,9 +1,9 @@
+require 'swig'
 require 'fileutils'
 require 'tmpdir'
 
-def crequire(file_path, options = {})
+def crequire(file_path, options = {}, &block)
   @force = options[:force]
-  @debug = options[:debug]
 
   @file_path = file_path
   @file = split_all(file_path).last
@@ -11,7 +11,14 @@ def crequire(file_path, options = {})
   if @force or !File.exists?("#{file_path}.o")
     Dir.mktmpdir do |tmp|
       @tmp = tmp
-      create_interface
+
+      if block
+        @swig = SWIG.new
+        @swig.context_eval(&block)
+        create_interface @swig
+      else
+        create_interface
+      end
       create_extconf
       install
     end
@@ -26,14 +33,26 @@ end
 
 private
 
-def create_interface
+def create_interface swig = nil
   File.open("#{temp_path}.i", 'w') do |file|
     file << <<-FILE
 %module #{@file}
 %{
-#include "#{@file}.h"
+#{
+if swig
+  swig.to_sig
+else
+  "#include \"#{@file}.h\""
+end
+}
 %}
-%include "#{@file}.h"
+#{
+if swig
+  swig.to_swig
+else
+  "%include \"#{@file}.h\""
+end
+}
 %include "cpointer.i"
     FILE
   end

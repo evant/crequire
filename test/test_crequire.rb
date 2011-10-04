@@ -5,7 +5,7 @@ require 'crequire'
 
 describe "crequire" do
   context "with simple example" do
-    crequire 'test/example1', :debug => true
+    crequire 'example1', :force => true
 
     it "should correctly call factorial" do
       Example1.fact(4).should == 24
@@ -26,9 +26,9 @@ describe "crequire" do
   end 
 
   context "with complex example" do
-    crequire 'test/example2', :debug => true do
+    crequire 'example2', :force => true do
       sum(:int, :int, :return => :int)
-      add(:int => :input, :int => :input, :int => :output)
+      add("int *INPUT", "int *INPUT", "int *OUTPUT")
     end  
 
     it "should correctly call sum" do

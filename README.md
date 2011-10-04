@@ -80,12 +80,12 @@ crequire "example2", :force => true do
   # you are defining. Pass in the types of the arguments in order, followed by
   # what is returned. You don't have to specify a return if it is void.   
 
-  sum(:int, :int, :returns => :int)
+  sum(:int, :int, :return => :int)
 
-  # To make working with pointers easer, you can define them as :input or
-  # :output. 
+  # To make working with pointers easer, you can define them as *INPUT or
+  # *OUTPUT.
 
-  add(:int => :input, :int => :input, :int => :output)
+  add("int *INPUT", "int *INPUT", "int *OUTPUT")
 end
 
 Example2.sum(1, 2) => 3
