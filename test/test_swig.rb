@@ -4,8 +4,8 @@ require '../lib/swig'
 describe SWIG do
   context "with sum" do
     before :each do
-      @swig = SWIG.new
-      @swig.sum(:int, :int, :return => :int)
+      @swig = SWIG::Functions.new
+      @swig.int @swig.sum(:int, :int)
     end
     
     it "should have the correct signiture" do
@@ -19,8 +19,8 @@ describe SWIG do
 
   context "with add" do
     before :each do
-      @swig = SWIG.new
-      @swig.add("int *INPUT", "int *INPUT", "int *OUTPUT")
+      @swig = SWIG::Functions.new
+      @swig.void @swig.add("int *INPUT", "int *INPUT", "int *OUTPUT")
     end
     
     it "should have the correct signiture" do

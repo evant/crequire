@@ -38,16 +38,15 @@ crequire "example1"
 
 Example1.fact(4) => 24
 
-a = ptrcreate("int", 1)
-b = ptrcreate("int", 2)
+a = Example1::Intp.new
+a.assign 1
+b = Example2::Intp.new
+b.assign 2
 
 Example1.swap(a, b)
 
-a => 2
-b => 1
-
-ptrfree(a)
-ptrfree(b)
+a.value => 2
+b.value => 1
 ```
 
 ## A complex example
@@ -76,16 +75,15 @@ require "crequire"
 # the 'example2.o' file for a recompile.
 
 crequire "example2", :force => true do
-  # To define a method signature, call a function corresponding to the function
-  # you are defining. Pass in the types of the arguments in order, followed by
-  # what is returned. You don't have to specify a return if it is void.   
+  # To define a function signature, declare the type followed by the function
+  # name, passing in the types as symbols or strings.
 
-  sum(:int, :int, :return => :int)
+  int sum(:int, :int)
 
   # To make working with pointers easer, you can define them as *INPUT or
   # *OUTPUT.
 
-  add("int *INPUT", "int *INPUT", "int *OUTPUT")
+  void add("int *INPUT", "int *INPUT", "int *OUTPUT")
 end
 
 Example2.sum(1, 2) => 3

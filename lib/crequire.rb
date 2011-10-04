@@ -1,6 +1,6 @@
-require 'swig'
 require 'fileutils'
 require 'tmpdir'
+require 'swig'
 
 def crequire(file_path, options = {}, &block)
   @force = options[:force]
@@ -13,11 +13,11 @@ def crequire(file_path, options = {}, &block)
       @tmp = tmp
 
       if block
-        @swig = SWIG.new
+        @swig = SWIG::Functions.new
         @swig.context_eval(&block)
-        create_interface @swig
+        save_interface @swig
       else
-        create_interface
+        save_interface
       end
       create_extconf
       install
@@ -31,18 +31,20 @@ def crequire(file_path, options = {}, &block)
   end
 end
 
-private
-
-def create_interface swig = nil
-  File.open("#{temp_path}.i", 'w') do |file|
-    file << <<-FILE
-%module #{@file}
+def create_interface(name, swig=nil)
+  out = <<-EOS
+%module #{name}
+%include "cpointer.i"
+%pointer_class(int, Intp);
+%pointer_class(double, Doublep);
+%pointer_class(char, Charp);
+%pointer_functions(char*, charpp);
 %{
 #{
 if swig
   swig.to_sig
 else
-  "#include \"#{@file}.h\""
+  "#include \"#{name}.h\""
 end
 }
 %}
@@ -50,11 +52,18 @@ end
 if swig
   swig.to_swig
 else
-  "%include \"#{@file}.h\""
+  "%include \"#{name}.h\""
 end
 }
-%include "cpointer.i"
-    FILE
+  EOS
+end
+
+
+private
+
+def save_interface(swig=nil)
+  File.open("#{temp_path}.i", 'w') do |file|
+    file << create_interface(@file, swig)   
   end
 end
 

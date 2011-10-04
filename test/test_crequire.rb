@@ -3,6 +3,40 @@ require 'tmpdir'
 require 'fileutils'
 require 'crequire'
 
+describe "create_interface" do
+  it "should default to including headers" do
+    create_interface('test').should == <<-TEXT
+%module test
+%include "cpointer.i"
+%pointer_class(int, Intp);
+%pointer_class(double, Doublep);
+%pointer_class(char, Charp);
+%pointer_functions(char*, charpp);
+%{
+#include "test.h"
+%}
+%include "test.h"
+    TEXT
+  end
+
+  it "should generate a custom interface correctly" do
+    swig = SWIG::Functions.new
+    swig.int swig.sum(:int, :int)
+    create_interface('test', swig).should == <<-TEXT
+%module test
+%include "cpointer.i"
+%pointer_class(int, Intp);
+%pointer_class(double, Doublep);
+%pointer_class(char, Charp);
+%pointer_functions(char*, charpp);
+%{
+extern int sum(int arg0, int arg1);
+%}
+extern int sum(int arg0, int arg1);
+    TEXT
+  end
+end
+
 describe "crequire" do
   context "with simple example" do
     crequire 'example1', :force => true
@@ -12,27 +46,29 @@ describe "crequire" do
     end
 
     it "should correctly call swap" do
-      a = ptrcreate("int", 1)
-      b = ptrcreate("int", 2)
+      a = Example1::Intp.new
+      a.assign 1
+      b = Example2::Intp.new
+      b.assign 2
 
       Example1.swap a, b
 
-      a.should == 2
-      b.should == 1
-
-      ptrfree(a)
-      ptrfree(b)
+      a.value.should == 2
+      b.value.should == 1
     end
   end 
 
   context "with complex example" do
     crequire 'example2', :force => true do
-      sum(:int, :int, :return => :int)
-      add("int *INPUT", "int *INPUT", "int *OUTPUT")
+      int sum(:int, :int)
+      void add("int *INPUT", "int *INPUT", "int *OUTPUT")
     end  
 
     it "should correctly call sum" do
       Example2.sum(1, 2).should == 3
+    end
+
+    it "should correctly call add" do
       Example2.add(3, 4).should == 7
     end
   end
