@@ -5,6 +5,7 @@ require 'crequire'
 
 describe "create_interface" do
   it "should default to including headers" do
+
     create_interface('test').should == <<-TEXT
 %module test
 %include "cpointer.i"
@@ -20,9 +21,8 @@ describe "create_interface" do
   end
 
   it "should generate a custom interface correctly" do
-    swig = SWIG::Functions.new
-    swig.int swig.sum(:int, :int)
-    create_interface('test', swig).should == <<-TEXT
+    input = "int sum(int, int)"
+    create_interface('test', input).should == <<-TEXT
 %module test
 %include "cpointer.i"
 %pointer_class(int, Intp);
@@ -60,8 +60,9 @@ describe "crequire" do
 
   context "with complex example" do
     crequire 'example2', :force => true do
-      int sum(:int, :int)
-      void add("int *INPUT", "int *INPUT", "int *OUTPUT")
+      int sum(int, int)
+      void add(int *INPUT, int *INPUT, int *OUTPUT)
+      int* echo(char *INPUT)
     end  
 
     it "should correctly call sum" do
@@ -70,6 +71,10 @@ describe "crequire" do
 
     it "should correctly call add" do
       Example2.add(3, 4).should == 7
+    end
+
+    it "should correctly call echo" do
+      Example2.echo("word").value.should == "word"
     end
   end
 end

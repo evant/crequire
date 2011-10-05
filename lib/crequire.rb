@@ -1,6 +1,10 @@
 require 'fileutils'
 require 'tmpdir'
+require 'sourcify'
 require 'swig'
+
+INPUT = []
+OUTPUT = []
 
 def crequire(file_path, options = {}, &block)
   @force = options[:force]
@@ -13,9 +17,8 @@ def crequire(file_path, options = {}, &block)
       @tmp = tmp
 
       if block
-        @swig = SWIG::Functions.new
-        @swig.context_eval(&block)
-        save_interface @swig
+        @input = block.to_source
+        save_interface @input
       else
         save_interface
       end
@@ -31,7 +34,7 @@ def crequire(file_path, options = {}, &block)
   end
 end
 
-def create_interface(name, swig=nil)
+def create_interface(name, input=nil)
   out = <<-EOS
 %module #{name}
 %include "cpointer.i"
@@ -41,16 +44,16 @@ def create_interface(name, swig=nil)
 %pointer_functions(char*, charpp);
 %{
 #{
-if swig
-  swig.to_sig
+if input
+  "extern #{input};"
 else
   "#include \"#{name}.h\""
 end
 }
 %}
 #{
-if swig
-  swig.to_swig
+if input
+  "extern #{input.gsub(/(INPUT)|(OUTPUT)/, "")};"
 else
   "%include \"#{name}.h\""
 end

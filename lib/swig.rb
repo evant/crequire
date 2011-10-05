@@ -4,17 +4,12 @@ module SWIG
       @functions = []
     end
 
-    def method_missing(m, *args)
+    def <<(func)
+      @functions << func
+    end
 
-      if args.size == 1 and args[0].class <= Function
-        func = args[0]
-        func.return = m
-        @functions << func
-      else
-        func = Function.new(m.to_s)
-        func.args = args.map {|arg| arg.to_s }
-        return func
-      end
+    def method_missing(m, *args)
+      return Type.new(m, args)
     end
 
     def to_sig
@@ -26,36 +21,48 @@ module SWIG
     end
   end
 
-  class Function
-    attr_accessor :name, :args, :return
+  class Type
+    attr_accessor :name, :args
 
-    def initialize(name)
+    def initialize(name, args)
       @name = name
-      @args = []
-      @return = :void
+      @args = args
+    end
+
+    def *(other)
+      @name += "*"
+      @args << other
+    end
+  end
+
+  INPUT = Type.new("INPUT", [])
+  OUTPUT = Type.new("OUTPUT", [])
+
+  class Function
+    def initialize(sig)
+      @sig = sig
     end
 
     def to_sig
-      res = "extern #{@return} #{@name}("
-      res << @args.each_with_index.map do |arg,i|
-        if arg =~ /(INPUT)|(OUTPUT)/
-          arg.to_s.gsub(/(INPUT)|(OUTPUT)/, "arg#{i}")
-        else
-          arg.to_s + " arg#{i}"
-        end
-      end.join(", ")
-      res << ");"
+      to_swig do |arg,i|
+        arg.gsub(/(INPUT)|(OUTPUT)/, "arg#{i}")
+      end
     end
 
     def to_swig
-      res = "extern #{@return} #{@name}("
-      res << @args.each_with_index.map do |arg,i|
-        if arg =~ /(INPUT)|(OUTPUT)/
-          arg.to_s
+      ret = @sig.name
+      name = @sig.args[0].name
+      args = @sig.args[0].args.each_with_index.map do |arg,i|
+        if arg.args.size > 0
+          a = arg.name + " " + arg.args[0]
+          yield(a,i) if block_given?
         else
-          arg.to_s + " arg#{i}"
-        end
-      end.join(", ")
+          arg.name + " arg#{i}"
+        end  
+      end
+
+      res = "extern #{ret} #{name}"
+      res << args.join(", ")
       res << ");"
     end
   end

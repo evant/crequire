@@ -31,4 +31,19 @@ describe SWIG do
       @swig.to_swig.should == "extern void add(int *INPUT, int *INPUT, int *OUTPUT);"
     end 
   end
+
+  context "with add" do
+    before :each do
+      @swig = SWIG::Functions.new
+      @swig.char* @swig.echo("char *INPUT")
+    end
+
+    it "should have the correct signiture" do
+      @swig.to_sig.should == "extern char* echo(char *arg0);"
+    end
+
+    it "should have the correct swig signature" do
+      @swig.to_swig.should == "extern char* echo(char *INPUT);"
+    end 
+  end
 end
