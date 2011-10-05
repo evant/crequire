@@ -1,12 +1,13 @@
 module SWIG
-  class Functions
+  class Context
     def initialize
       @functions = []
     end
 
     def method_missing(m, *args)
-
-      if args.size == 1 and args[0].class <= Function
+      if args.size == 0
+        Unknown.new m, @functions
+      elsif args.size == 1 and [Function, Unknown].include? args[0].class
         func = args[0]
         func.return = m
         @functions << func
@@ -36,27 +37,55 @@ module SWIG
     end
 
     def to_sig
-      res = "extern #{@return} #{@name}("
-      res << @args.each_with_index.map do |arg,i|
+      to_s do |arg,i|
         if arg =~ /(INPUT)|(OUTPUT)/
           arg.to_s.gsub(/(INPUT)|(OUTPUT)/, "arg#{i}")
         else
           arg.to_s + " arg#{i}"
         end
-      end.join(", ")
-      res << ");"
+      end
     end
 
     def to_swig
-      res = "extern #{@return} #{@name}("
-      res << @args.each_with_index.map do |arg,i|
+      to_s do |arg,i|
         if arg =~ /(INPUT)|(OUTPUT)/
           arg.to_s
         else
           arg.to_s + " arg#{i}"
         end
+      end
+    end
+
+    def to_s
+      res = "extern #{@return} #{@name}("
+      res << @args.each_with_index.map do |arg,i|
+        if block_given?
+          yield(arg, i)
+        else
+          arg.to_s
+        end
       end.join(", ")
       res << ");"
+    end
+  end
+
+  private
+
+  class Unknown
+    def initialize(name, functions)
+      @name = name
+      @functions = functions
+    end
+
+    def return=(value)
+      func = Function.new(@name)
+      func.return = value
+      return func
+    end
+
+    def *(func)
+      func.return = @name.to_s + "*"  
+      @functions << func
     end
   end
 end

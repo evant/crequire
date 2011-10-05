@@ -20,8 +20,10 @@ describe "create_interface" do
   end
 
   it "should generate a custom interface correctly" do
-    swig = SWIG::Functions.new
-    swig.int swig.sum(:int, :int)
+    swig = SWIG::Context.new
+    swig.instance_eval do
+      int sum(:int, :int)
+    end
     create_interface('test', swig).should == <<-TEXT
 %module test
 %include "cpointer.i"
@@ -39,7 +41,7 @@ end
 
 describe "crequire" do
   context "with simple example" do
-    crequire 'example1', :force => true
+    crequire 'test/example1', :force => true
 
     it "should correctly call factorial" do
       Example1.fact(4).should == 24
@@ -59,9 +61,10 @@ describe "crequire" do
   end 
 
   context "with complex example" do
-    crequire 'example2', :force => true do
+    crequire 'test/example2', :force => true, :interface => true do
       int sum(:int, :int)
       void add("int *INPUT", "int *INPUT", "int *OUTPUT")
+      char* echo("char *INPUT")
     end  
 
     it "should correctly call sum" do
@@ -70,6 +73,10 @@ describe "crequire" do
 
     it "should correctly call add" do
       Example2.add(3, 4).should == 7
+    end
+
+    it "should correctly call echo" do
+      Example2.echo("hi").value.should == "hi"
     end
   end
 end

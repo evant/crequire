@@ -4,6 +4,7 @@ require 'swig'
 
 def crequire(file_path, options = {}, &block)
   @force = options[:force]
+  @interface = options[:interface]
 
   @file_path = file_path
   @file = split_all(file_path).last
@@ -13,7 +14,7 @@ def crequire(file_path, options = {}, &block)
       @tmp = tmp
 
       if block
-        @swig = SWIG::Functions.new
+        @swig = SWIG::Context.new
         @swig.context_eval(&block)
         save_interface @swig
       else
@@ -88,14 +89,23 @@ def install
   `make install`
   Dir.chdir dir
 
-  FileUtils.cp File.join(@tmp, @file + "_wrap.o"), @file_path + ".o"
+  wrap_file = File.join(@tmp, @file + "_wrap.o")
+  copy_out wrap_file, @file_path + ".o"
+  copy_out File.join(@tmp, @file + ".i"), @file_path + ".i" if @interface
 end
 
 def copy_in(file_path, name, ext)
   if File.exists?(file_path + ext)
     FileUtils.cp file_path + ext, File.join(@tmp, name) + ext
-  elsif @debug
-    puts "could not find file: #{file_path + ext} in #{Dir.pwd}"
+  end
+end
+
+def copy_out(name, destination)
+  path = File.join(@tmp, name)
+  if File.exist?(path)
+    FileUtils.cp path, destination
+  else
+    puts "can't find file #{name}"
   end
 end
 

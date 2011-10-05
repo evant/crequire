@@ -1,5 +1,7 @@
 require 'rspec'
-require '../lib/swig'
+require 'swig'
+
+include SWIG
 
 describe Function do
   context "with sum" do
@@ -30,6 +32,22 @@ describe Function do
 
     it "should have the correct swig signature" do
       @add.to_swig.should == "extern void add(int *INPUT, int *INPUT, int *OUTPUT);"
+    end 
+  end
+
+  context "with echo" do
+    before :each do
+      @echo = Function.new("echo")
+      @echo.args = ["char *INPUT"] 
+      @echo.return = "char*"
+    end
+
+    it "should have the correct signiture" do
+      @echo.to_sig.should == "extern char* echo(char *arg0);"
+    end
+
+    it "should have the correct swig signature" do
+      @echo.to_swig.should == "extern char* echo(char *INPUT);"
     end 
   end
 end
