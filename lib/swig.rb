@@ -4,6 +4,7 @@ module SWIG
       @functions = []
     end
 
+<<<<<<< HEAD
     def method_missing(m, *args)
       if args.size == 0
         Unknown.new m, @functions
@@ -16,6 +17,14 @@ module SWIG
         func.args = args.map {|arg| arg.to_s }
         return func
       end
+=======
+    def <<(func)
+      @functions << func
+    end
+
+    def method_missing(m, *args)
+      return Type.new(m, args)
+>>>>>>> 1bb8006dc4855483ca9ec5770e93f9cad9b93cf6
     end
 
     def to_sig
@@ -27,26 +36,45 @@ module SWIG
     end
   end
 
-  class Function
-    attr_accessor :name, :args, :return
+  class Type
+    attr_accessor :name, :args
 
-    def initialize(name)
+    def initialize(name, args)
       @name = name
-      @args = []
-      @return = :void
+      @args = args
+    end
+
+    def *(other)
+      @name += "*"
+      @args << other
+    end
+  end
+
+  INPUT = Type.new("INPUT", [])
+  OUTPUT = Type.new("OUTPUT", [])
+
+  class Function
+    def initialize(sig)
+      @sig = sig
     end
 
     def to_sig
+<<<<<<< HEAD
       to_s do |arg,i|
         if arg =~ /(INPUT)|(OUTPUT)/
           arg.to_s.gsub(/(INPUT)|(OUTPUT)/, "arg#{i}")
         else
           arg.to_s + " arg#{i}"
         end
+=======
+      to_swig do |arg,i|
+        arg.gsub(/(INPUT)|(OUTPUT)/, "arg#{i}")
+>>>>>>> 1bb8006dc4855483ca9ec5770e93f9cad9b93cf6
       end
     end
 
     def to_swig
+<<<<<<< HEAD
       to_s do |arg,i|
         if arg =~ /(INPUT)|(OUTPUT)/
           arg.to_s
@@ -65,6 +93,21 @@ module SWIG
           arg.to_s
         end
       end.join(", ")
+=======
+      ret = @sig.name
+      name = @sig.args[0].name
+      args = @sig.args[0].args.each_with_index.map do |arg,i|
+        if arg.args.size > 0
+          a = arg.name + " " + arg.args[0]
+          yield(a,i) if block_given?
+        else
+          arg.name + " arg#{i}"
+        end  
+      end
+
+      res = "extern #{ret} #{name}"
+      res << args.join(", ")
+>>>>>>> 1bb8006dc4855483ca9ec5770e93f9cad9b93cf6
       res << ");"
     end
   end

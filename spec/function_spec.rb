@@ -1,13 +1,12 @@
 require 'rspec'
-require 'swig'
-
-include SWIG
+require 'crequire'
 
 include SWIG
 
 describe Function do
   context "with sum" do
     before :each do
+      @sum = Function.new "sum"
       @sum= Function.new("sum")
       @sum.args = [:int, :int]
       @sum.return = :int
@@ -40,11 +39,7 @@ describe Function do
   context "with echo" do
     before :each do
       @echo = Function.new("echo")
-<<<<<<< HEAD
-      @echo.args = ["char *INPUT"] 
-=======
       @echo.args = ["char *INPUT"]
->>>>>>> 1bb8006dc4855483ca9ec5770e93f9cad9b93cf6
       @echo.return = "char*"
     end
 

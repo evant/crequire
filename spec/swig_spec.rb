@@ -1,5 +1,5 @@
 require 'rspec'
-require 'swig'
+require 'crequire/swig'
 
 describe SWIG do
   context "with sum" do
@@ -36,19 +36,12 @@ describe SWIG do
     end 
   end
 
-<<<<<<< HEAD
   context "with echo" do
     before :each do
       @swig = SWIG::Context.new
       @swig.instance_eval do
         char* echo("char *INPUT")
       end
-=======
-  context "with add" do
-    before :each do
-      @swig = SWIG::Functions.new
-      @swig.char* @swig.echo("char *INPUT")
->>>>>>> 1bb8006dc4855483ca9ec5770e93f9cad9b93cf6
     end
 
     it "should have the correct signiture" do
