@@ -29,6 +29,10 @@ class Require
 
 return <<-EOS
 %module #{@name}
+%include "pointer.i"
+%include "cpointer.i"
+%pointer_class(int, Intp)
+%pointer_class(double, Doublep)
 %{
 #{
   if block

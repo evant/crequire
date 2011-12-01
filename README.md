@@ -12,11 +12,11 @@ A simply way to require c code in ruby using SWIG.
 
 ### example1.h
 
-```c
-// If you have a header file then the functions are detected automatically. You
-// can either define the functions in the header file or define a header and
-// implementation file separately.
+If you have a header file then the functions are detected automatically. You
+can either define the functions in the header file or define a header and
+implementation file separately.
 
+```c
 int fact(int n) {
   if (n <= 1) return 1;
   else return n * fact(n-1);
@@ -35,15 +35,16 @@ void swap(int *a, int *b) {
 ```ruby
 require "crequire"
 crequire "example1"
+include Example1
 
-Example1.fact(4) => 24
+fact(4) => 24
 
-a = Example1::Intp.new
+a = Intp.new
 a.assign 1
-b = Example2::Intp.new
+b = Intp.new
 b.assign 2
 
-Example1.swap(a, b)
+swap(a, b)
 
 a.value => 2
 b.value => 1
@@ -53,16 +54,20 @@ b.value => 1
 
 ### example2.c
 
-```c
-// If you don't define a header file, you must pass in a block to define the
-// method signatures.
+If you don't define a header file, you must pass in a block to define the
+method signatures.
 
+```c
 int sum(int a, int b) {
   return a + b;
 }
 
 void add(int *x, int *y, int *r) {
   *r = *x + *y;
+}
+
+char* echo(char* word) {
+  return word;
 }
 ```
 
@@ -84,10 +89,16 @@ crequire "example2", :force => true do
   # *OUTPUT.
 
   void add("int *INPUT", "int *INPUT", "int *OUTPUT")
+
+  # char* is automatically converted to and from string
+  char* echo("char*")
 end
 
-Example2.sum(1, 2) => 3
-Example2.add(3, 4) => 7
+include Example2
+
+sum(1, 2) => 3
+add(3, 4) => 7
+echo("hi") => "hi"
 ```
 
 ## Contributing to crequire

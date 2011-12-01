@@ -11,6 +11,10 @@ describe "interface" do
 
     @crequire.interface.should == <<-TEXT
 %module test
+%include "pointer.i"
+%include "cpointer.i"
+%pointer_class(int, Intp)
+%pointer_class(double, Doublep)
 %{
 #include "test.h"
 %}
@@ -25,6 +29,10 @@ describe "interface" do
     end
     @crequire.interface { int sum(:int, :int) }.should == <<-TEXT
 %module test
+%include "pointer.i"
+%include "cpointer.i"
+%pointer_class(int, Intp)
+%pointer_class(double, Doublep)
 %{
 extern int sum(int arg0, int arg1);
 %}
@@ -44,7 +52,7 @@ describe "crequire" do
     it "should correctly call swap" do
       a = Example1::Intp.new
       a.assign 1
-      b = Example2::Intp.new
+      b = Example1::Intp.new
       b.assign 2
 
       Example1.swap a, b
@@ -58,7 +66,7 @@ describe "crequire" do
     crequire 'spec/example2', :force => true, :interface => true do
       int sum(:int, :int)
       void add("int *INPUT", "int *INPUT", "int *OUTPUT")
-      char* echo("char *INPUT")
+      char* echo("char*")
     end  
 
     it "should correctly call sum" do
@@ -70,7 +78,7 @@ describe "crequire" do
     end
 
     it "should correctly call echo" do
-      Example2.echo("word").value.should == "word"
+      Example2.echo("word").should == "word"
     end
   end
 end
