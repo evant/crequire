@@ -15,7 +15,5 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Crequire::VERSION
 
-  gem.add_dependency "sourcify", "~> 0.5"
-
   gem.add_development_dependency "rspec", "~> 2.7"
 end

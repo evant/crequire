@@ -10,11 +10,11 @@ A simply way to require c code in ruby using SWIG.
 
 ## A simple example
 
-### example1.h
-
 If you have a header file then the functions are detected automatically. You
 can either define the functions in the header file or define a header and
 implementation file separately.
+
+### example1.h
 
 ```c
 int fact(int n) {
@@ -52,10 +52,10 @@ b.value => 1
 
 ## A complex example
 
-### example2.c
-
 If you don't define a header file, you must pass in a block to define the
 method signatures.
+
+### example2.c
 
 ```c
 int sum(int a, int b) {
@@ -99,6 +99,52 @@ include Example2
 sum(1, 2) => 3
 add(3, 4) => 7
 echo("hi") => "hi"
+```
+
+## Advanced Options
+
+You can use the ```c``` and ```swig``` methods to directly pass a line to the interface
+file. ```c``` puts the line inside the ```{% %}``` while ```swig``` puts it
+outside that.
+
+### example2.c
+
+```c
+int sum(int a, int b) {
+  return a + b;
+}
+```
+
+### test_example3.rb
+
+```ruby
+require 'crequire'
+
+# :interface => directory outputs the generated interface file to the given
+# directory. If you want to dump all generated files, you can use
+# :dump => directory
+
+crequire "example3", :force => true, :interface => "example3" do
+  c "extern int sum(int a, int b);"
+  swig "extern int sum(int a, int b);"
+end
+
+include Example3
+
+sum(1, 2) => 3
+```
+
+### example3/example3.i
+
+```c
+%module example3
+%include "cpointer.i"
+%pointer_class(int, Intp)
+%pointer_class(double, Doublep)
+%{
+extern int sum(int a, int b);
+%}
+extern int sum(int a, int b);
 ```
 
 ## Contributing to crequire

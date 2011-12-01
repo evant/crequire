@@ -52,4 +52,22 @@ describe SWIG do
       @swig.to_swig.should == "extern char* echo(char *INPUT);"
     end 
   end
+
+  context "with string" do
+    before :each do
+      @swig = SWIG::Context.new
+      @swig.instance_eval do
+        swig '%include "header.h"' 
+        c '#include "header.h"'
+      end
+    end
+
+    it "should add the correct c code" do
+      @swig.to_sig.should == '#include "header.h"'
+    end
+
+    it "should add the correct swig code" do
+      @swig.to_swig.should == '%include "header.h"'
+    end
+  end
 end

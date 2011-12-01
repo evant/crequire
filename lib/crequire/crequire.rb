@@ -10,9 +10,18 @@ class Require
   def crequire(options = {}, &block)
 
     if options[:force] or !File.exists? "#{@full_path}.o"
-      Dir.mktmpdir do |tmp|
-        save tmp, &block
-        install tmp
+
+      @dump_interface = options[:interface]
+      if options[:dump]
+        dir = options[:dump]
+        FileUtils.mkpath dir
+        save dir, &block
+        install dir
+      else
+        Dir.mktmpdir do |tmp|
+          save tmp, &block
+          install tmp
+        end
       end
     end
 
@@ -29,7 +38,6 @@ class Require
 
 return <<-EOS
 %module #{@name}
-%include "pointer.i"
 %include "cpointer.i"
 %pointer_class(int, Intp)
 %pointer_class(double, Doublep)
@@ -94,6 +102,12 @@ EOS
 
     output = File.join path, "#{@name}_wrap.o"
     FileUtils.cp output, "#{@full_path}.o"
+
+    if @dump_interface
+      i = File.join path, "#{@name}.i"
+      dest = File.join @dump_interface, "#{@name}.i"
+      FileUtils.cp i, dest
+    end
   end
 
   def try_copy(name, path)

@@ -11,7 +11,6 @@ describe "interface" do
 
     @crequire.interface.should == <<-TEXT
 %module test
-%include "pointer.i"
 %include "cpointer.i"
 %pointer_class(int, Intp)
 %pointer_class(double, Doublep)
@@ -29,7 +28,6 @@ describe "interface" do
     end
     @crequire.interface { int sum(:int, :int) }.should == <<-TEXT
 %module test
-%include "pointer.i"
 %include "cpointer.i"
 %pointer_class(int, Intp)
 %pointer_class(double, Doublep)
@@ -63,7 +61,7 @@ describe "crequire" do
   end 
 
   context "with complex example" do
-    crequire 'spec/example2', :force => true, :interface => true do
+    crequire 'spec/example2', :force => true do
       int sum(:int, :int)
       void add("int *INPUT", "int *INPUT", "int *OUTPUT")
       char* echo("char*")
@@ -79,6 +77,21 @@ describe "crequire" do
 
     it "should correctly call echo" do
       Example2.echo("word").should == "word"
+    end
+  end
+
+  context "with advanced exmple" do
+    crequire 'spec/example3', :force => true, :interface => "spec" do
+      c "extern int sum(int a, int b);"
+      swig "extern int sum(int a, int b);"
+    end 
+
+    it "should correctly call add" do
+      Example3.sum(1, 2).should == 3
+    end
+
+    it "should create the interface file spec/example3.i" do
+      File.exists? "spec/example3.i"
     end
   end
 end

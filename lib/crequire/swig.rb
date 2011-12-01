@@ -2,6 +2,8 @@ module SWIG
   class Context
     def initialize
       @functions = []
+      @swigs = []
+      @cs = []
     end
 
     def method_missing(m, *args)
@@ -20,11 +22,21 @@ module SWIG
       @functions << f
     end
 
+    def swig(line)
+      @swigs << line
+    end
+
+    def c(line)
+      @cs << line
+    end
+
     def to_sig
+      @cs.join("\n") +
       @functions.map {|f| f.to_sig}.join("\n")
     end
 
     def to_swig
+      @swigs.join("\n") +
       @functions.map {|f| f.to_swig}.join("\n")
     end
   end
