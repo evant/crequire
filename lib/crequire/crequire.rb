@@ -7,8 +7,7 @@ class Require
     @name = File.basename file_path
   end
 
-  def crequire(options = {}, &block)
-
+  def require(options = {}, source=nil, &block)
     if options[:force] or !File.exists? "#{@full_path}.o"
 
       @dump_interface = options[:interface]
@@ -25,47 +24,24 @@ class Require
       end
     end
 
-    require @name
+    Kernel.require @name
   end
 
-  def interface(&block)
+  def interface(source=nil, &block)
+    if source
+      source
+    else
+      swig = SWIG::Context.new
+      swig.input &block if block
+    end
+  end
 
-  input = if block
-            swig = SWIG::Context.new
-            swig.instance_eval &block
-            swig
-          end
-
-return <<-EOS
-%module #{@name}
-%include "cpointer.i"
-%pointer_class(int, Intp)
-%pointer_class(double, Doublep)
-%{
-#{
-  if block
-    input.to_sig
-  else
-    "#include \"#{@name}.h\""
-  end
-}
-%}
-#{
-  if block
-    input.to_swig
-  else
-    "%include \"#{@name}.h\""    
-  end
-}
-EOS
-  end
+  private
 
   def save(path, &block)
     save_interface path, &block
     save_extconf path
   end
-
-  private
 
   def save_interface(path, &block)
     File.open(File.join(path, "#{@name}.i"), 'w') do |file|
@@ -80,10 +56,8 @@ EOS
   end
 
   def extconf
-return <<-EOS
-require 'mkmf'
-create_makefile('#{@name}')
-EOS
+    "require 'mkmf'\n" +
+    "create_makefile('#{@name}')"
   end
 
   def install(path)
@@ -119,6 +93,6 @@ EOS
   end
 end
 
-def crequire(file_path, options = {}, &block)
-  Require.new(file_path).crequire options, &block
+def crequire(file_path, options = {}, source=nil &block)
+  Require.new(file_path).require options, source, &block
 end
