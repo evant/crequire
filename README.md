@@ -103,9 +103,8 @@ echo("hi") => "hi"
 
 ## Advanced Options
 
-You can use the ```c``` and ```swig``` methods to directly pass a line to the interface
-file. ```c``` puts the line inside the ```{% %}``` while ```swig``` puts it
-outside that.
+You can use :src => string to pass in the contents of the interface file
+directly.
 
 ### example2.c
 
@@ -124,10 +123,13 @@ require 'crequire'
 # directory. If you want to dump all generated files, you can use
 # :dump => directory
 
-crequire "example3", :force => true, :interface => "example3" do
-  c "extern int sum(int a, int b);"
-  swig "extern int sum(int a, int b);"
-end
+interface = "%module example3 
+%{ 
+extern int sum(int a, int b);
+%}
+extern int sum(int a, int b);" 
+
+crequire "example3", :force => true, :interface => "example3", :src => interface
 
 include Example3
 
