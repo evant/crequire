@@ -25,7 +25,7 @@ module SWIG
 
     def <<(input)
       @pointers << input if input.is_a? Pointer
-      @functions << input if input.if_a? Function
+      @functions << input if input.is_a? Function
     end
 
     def pointer(p, name = nil)
@@ -38,18 +38,19 @@ module SWIG
         output << "%include \"cpointer.i\"\n" +
           @pointers.map {|p| p.to_s}.join("\n")
       end
+      output << "%{\n"
       output << if @functions.size > 0
                   @functions.map {|f| f.to_s}.join("\n")
                 else
                   "#include \"#{@name}.h\""
                 end
+      output << "\n%}\n"
       output << if @functions.size > 0
                   @functions.map {|f| f.to_swig_s}.join("\n")
                 else
                   "%include \"#{@name}.h\""    
                 end
     end
- end
   end
 
   class Unknown

@@ -7,9 +7,10 @@ class Require
     @name = File.basename file_path
   end
 
-  def require(options = {}, source=nil, &block)
+  def require(options = {}, &block)
     if options[:force] or !File.exists? "#{@full_path}.o"
 
+      @src = options[:src]
       @dump_interface = options[:interface]
       if options[:dump]
         dir = options[:dump]
@@ -31,8 +32,9 @@ class Require
     if source
       source
     else
-      swig = SWIG::Context.new
+      swig = SWIG::Context.new(@name)
       swig.input &block if block
+      swig.interface
     end
   end
 
@@ -45,7 +47,7 @@ class Require
 
   def save_interface(path, &block)
     File.open(File.join(path, "#{@name}.i"), 'w') do |file|
-      file << interface(&block)
+      file << interface(@src, &block)
     end
   end
 
@@ -93,6 +95,6 @@ class Require
   end
 end
 
-def crequire(file_path, options = {}, source=nil &block)
-  Require.new(file_path).require options, source, &block
+def crequire(file_path, options = {}, &block)
+  Require.new(file_path).require options, &block
 end

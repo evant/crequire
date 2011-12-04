@@ -80,10 +80,15 @@ describe "crequire" do
 
   context "with custom interface input" do
     before :all do
-      crequire 'spec/sum', :force => true,
-        "%module sum\n" +
-        "%{\nextern int sum(int arg0, int arg1);\n%}" +
-        "extern int sum(int arg0, int arg1);"
+      interface = <<-TEXT
+        %module sum
+        %{
+        extern int sum(int arg0, int arg1);
+        %}
+        extern int sum(int arg0, int arg1);
+      TEXT
+
+      crequire 'spec/sum', :force => true, :src => interface
     end
 
     it "should correctly call the function" do
