@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'tmpdir'
 
 class Require
   def initialize(file_path)
@@ -11,6 +12,7 @@ class Require
     if options[:force] or !File.exists? "#{@full_path}.o"
 
       @src = options[:src]
+      @cflags = options[:cflags]
       @dump_interface = options[:interface]
       if options[:dump]
         dir = options[:dump]
@@ -58,8 +60,9 @@ class Require
   end
 
   def extconf
-    "require 'mkmf'\n" +
-    "create_makefile('#{@name}')"
+    output = "require 'mkmf'\n"
+    output << "$CFLAGS << ' #{@cflags}'\n" if @cflags
+    output << "create_makefile('#{@name}')"
   end
 
   def install(path)

@@ -103,14 +103,18 @@ echo("hi") => "hi"
 
 ## Advanced Options
 
-You can use :src => string to pass in the contents of the interface file
+You can use ```:src => string``` to pass in the contents of the interface file
 directly.
 
 ### example2.c
 
 ```c
-int sum(int a, int b) {
-  return a + b;
+int sum(int a, int b, int times) {
+  int result = a;
+  for (int i = 0; i < times; i++) {
+    result += b;
+  }
+  return result;
 }
 ```
 
@@ -119,30 +123,29 @@ int sum(int a, int b) {
 ```ruby
 require 'crequire'
 
-# :interface => directory outputs the generated interface file to the given
+# ```:interface => directory``` outputs the generated interface file to the given
 # directory. If you want to dump all generated files, you can use
-# :dump => directory
+# ```:dump => directory```.
+
 
 interface = "%module example3 
 %{ 
-extern int sum(int a, int b);
+extern int sum(int a, int b, int times);
 %}
-extern int sum(int a, int b);" 
+extern int sum(int a, int b, int times);" 
 
-crequire "example3", :force => true, :interface => "example3", :src => interface
+# You can use ```:cflags => flags``` to set c compiler options.
+crequire "example3", :force => true, :cflags => "-std=c99", :interface => "example3", :src => interface
 
 include Example3
 
-sum(1, 2) => 3
+sum(1, 2, 2) => 5
 ```
 
 ### example3/example3.i
 
 ```c
 %module example3
-%include "cpointer.i"
-%pointer_class(int, Intp)
-%pointer_class(double, Doublep)
 %{
 extern int sum(int a, int b);
 %}
