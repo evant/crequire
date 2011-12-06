@@ -102,9 +102,13 @@ echo("hi") => "hi"
 
 ```:force => true``` Forces a compile on every run. Otherwise compile only
 happens if compiled no file is found.
+
 ```:src => "string"``` Defines the contents of the interface file directly.
+
 ```:interface => "dir"``` Outputs the generated interface file to the given directory.
+
 ```:dump => "dir"``` Outputs all generated files to the given directory. 
+
 ```:cflags => "flags"``` Pass cflags to make.
 
 ### example2.c
