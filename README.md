@@ -76,10 +76,7 @@ char* echo(char* word) {
 ```ruby
 require "crequire"
 
-# :force => true forces a compile on every run. Alternatively, you can delete
-# the 'example2.o' file for a recompile.
-
-crequire "example2", :force => true do
+crequire "example2" do
   # To define a function signature, declare the type followed by the function
   # name, passing in the types as symbols or strings.
 
@@ -103,8 +100,12 @@ echo("hi") => "hi"
 
 ## Advanced Options
 
-You can use ```:src => string``` to pass in the contents of the interface file
-directly.
+```:force => true``` Forces a compile on every run. Otherwise compile only
+happens if compiled no file is found.
+```:src => "string"``` Defines the contents of the interface file directly.
+```:interface => "dir"``` Outputs the generated interface file to the given directory.
+```:dump => "dir"``` Outputs all generated files to the given directory. 
+```:cflags => "flags"``` Pass cflags to make.
 
 ### example2.c
 
@@ -123,18 +124,12 @@ int sum(int a, int b, int times) {
 ```ruby
 require 'crequire'
 
-# ```:interface => directory``` outputs the generated interface file to the given
-# directory. If you want to dump all generated files, you can use
-# ```:dump => directory```.
-
-
 interface = "%module example3 
 %{ 
 extern int sum(int a, int b, int times);
 %}
 extern int sum(int a, int b, int times);" 
 
-# You can use ```:cflags => flags``` to set c compiler options.
 crequire "example3", :force => true, :cflags => "-std=c99", :interface => "example3", :src => interface
 
 include Example3

@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["evantatarka@gmail.com"]
   gem.description   = %q{A simple way to require c files using swig.}
   gem.summary       = %q{A simple way to require c files using swig.}
-  gem.homepage      = ""
+  gem.homepage      = "http://github.com/evant/crequire"
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.files         = `git ls-files`.split("\n")
