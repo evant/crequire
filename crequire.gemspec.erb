@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{A simple way to require c files using swig.}
   gem.homepage      = "http://github.com/evant/crequire"
 
-  gem.files         = ["lib/crequire/crequire.rb", "lib/crequire/swig.rb", "lib/crequire/version.rb", "lib/crequire.rb", "README.md", "Rakefile", "spec/echo.o", "spec/sum.c", "spec/crequire_spec.rb", "spec/swig_spec.rb", "spec/fact.o", "spec/echo.c", "spec/sum.o", "spec/fact.h", "spec/add.c"]
-  gem.test_files    = ["spec/echo.o", "spec/sum.c", "spec/crequire_spec.rb", "spec/swig_spec.rb", "spec/fact.o", "spec/echo.c", "spec/sum.o", "spec/fact.h", "spec/add.c"]
+  gem.files         = <%= Dir['lib/**/*.rb', 'README*', 'LICENSE', 'Rakefile', 'spec/**/*.*'].inspect %>
+  gem.test_files    = <%= Dir['spec/**/*.*'].inspect %>
   gem.name          = "crequire"
   gem.require_paths = ["lib"]
   gem.version       = Crequire::VERSION
