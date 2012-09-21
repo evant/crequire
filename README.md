@@ -1,6 +1,9 @@
 # crequire
 
-A simply way to require c code in ruby using SWIG.
+A simply DSL to require c code in ruby using SWIG.
+
+## Install
+`gem install crequire`
 
 ## Dependencies
 
